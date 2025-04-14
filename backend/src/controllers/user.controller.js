@@ -1,6 +1,7 @@
+import User from '../models/user.model.js'
 import cloudinary from '../lib/cloudinary.js'
 
-export const updateProfileController = async (req, res) => {
+export const updateAvatarController = async (req, res) => {
   try {
     const { avatar } = req.body
     const userId = req.user._id

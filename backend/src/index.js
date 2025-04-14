@@ -11,6 +11,7 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT
 
+app.use(express.json({ limit: '10mb' }))
 app.use(express.json()) // 解析JSON請求體
 app.use(cookieParser()) // 解析cookie
 app.use(
