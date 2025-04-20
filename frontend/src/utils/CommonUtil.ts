@@ -11,4 +11,14 @@ export default class CommonUtil {
   static setLocalStorage<T>(key: string, value: T) {
     localStorage.setItem(key, JSON.stringify(value))
   }
+
+  static formatMessageTime(date: Date | string): string {
+    return new Date(date).toLocaleDateString("zh-TW", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    })
+  }
 }
