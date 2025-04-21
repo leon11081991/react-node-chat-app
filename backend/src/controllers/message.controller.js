@@ -1,6 +1,7 @@
 import cloudinary from '../lib/cloudinary.js'
 import User from '../models/user.model.js'
 import Message from '../models/message.model.js'
+import { io, getReceiverSocketId } from '../lib/socket.js'
 
 export const getContactsController = async (req, res) => {
   try {
@@ -52,7 +53,13 @@ export const sendMessageController = async (req, res) => {
       image: imageUrl,
     })
 
-    // TODO: socket.io
+    // 取得接收者socket id
+    const receiverSocketId = getReceiverSocketId(receiverId)
+    console.log('receiverSocketId', receiverSocketId)
+    if (receiverSocketId) {
+      // 如果接收者有上線
+      io.to(receiverSocketId).emit('newMessage', newMessage) // 向接收者廣播新訊息
+    }
 
     return res.status(201).json(newMessage)
   } catch (error) {

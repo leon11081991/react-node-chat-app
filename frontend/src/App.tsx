@@ -12,7 +12,10 @@ import { Toaster } from "react-hot-toast"
 const App = () => {
   console.log("App render");
   const authUser = useUserStore((state)=>state.authUser)
+  const onlineContacts = useAuthStore((state)=>state.onlineContacts)
   const checkAuth = useAuthStore((state) => state.checkAuth)
+
+  console.log("onlineContacts", onlineContacts);
 
   useEffect(()=>{
     console.log("App useEffect");
