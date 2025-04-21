@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   backend:
@@ -8,11 +8,21 @@ services:
       - "${BACKEND_PORT}:5001"
     env_file:
       - ./backend/${ENV_FILE}
+    networks:
+      - mynet
 
   frontend:
     build:
       context: ./frontend
     ports:
       - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend
     env_file:
       - ./frontend/${ENV_FILE}
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
