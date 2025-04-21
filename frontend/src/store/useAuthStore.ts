@@ -152,7 +152,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { authUser } = useUserStore.getState()
     if (!authUser || get().socket?.connected) return
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL, {
+    const SOCKET_URL = import.meta.env.VITE_MODE === 'dev' ? import.meta.env.VITE_SOCKET_URL : '/'
+
+    const socket = io(SOCKET_URL, {
       query: {
         userId: authUser.data?._id
       }
