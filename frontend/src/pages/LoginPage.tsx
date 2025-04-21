@@ -1,3 +1,4 @@
+import type { LoginData } from "../types/user.type"
 import { useState } from "react"
 import { useAuthStore } from "../store/useAuthStore"
 import { Link } from "react-router-dom"
@@ -6,7 +7,7 @@ import toast from "react-hot-toast"
 
 const LoginPage = () => {
   const [ showPassword, setShowPassword ] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginData>({
     email: "",
     password: "",
   })
@@ -21,7 +22,6 @@ const LoginPage = () => {
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("handleLogin");
     const isValid = validateForm()
     if(!isValid) return
     login(formData)

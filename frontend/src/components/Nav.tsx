@@ -1,8 +1,10 @@
 import { User } from "../types/user.type"
 import { Link } from "react-router-dom"
 import Logo from "../components/Logo"
+import ThemeController from "../components/ThemeController"
 import { useAuthStore } from "../store/useAuthStore"
 import { LogOutIcon, SquareUserIcon } from "lucide-react"
+import { useThemeContext } from "../contexts/themeContext"
 
 interface NavProps {
   user: User | null
@@ -10,6 +12,7 @@ interface NavProps {
 
 const Nav = ({user}: NavProps) => {
   const { logout } = useAuthStore()
+  const {theme, toggleTheme} = useThemeContext()
 
   return (
     <header>
@@ -17,6 +20,8 @@ const Nav = ({user}: NavProps) => {
         <Link to={"/"} className="mr-auto">
           <Logo/>
         </Link>
+
+        <ThemeController theme={theme} toggleTheme={toggleTheme}/>
 
         {user && <Link to={"/profile"} className="btn btn-square btn-ghost border-none shadow-sm hover:bg-primary">
           <SquareUserIcon/>

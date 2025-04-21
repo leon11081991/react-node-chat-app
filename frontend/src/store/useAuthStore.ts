@@ -1,63 +1,52 @@
-import { User } from "../types/user.type"
+import type { Socket } from "socket.io-client";
+import type { LoginData, SignupData } from "../types/user.type";
 import { create } from "zustand";
+import { useUserStore } from "./useUserStore.ts";
 import axiosInstance from "../utils/api/axios-instance.ts";
 import toast from "react-hot-toast";
 import errorHandler from "../utils/api/error-handler.ts";
-
-// todo: 將interface移到型別資料夾
-interface AuthUser {
-  data: User | null;
-  isLoading: boolean;
-}
+import { io } from "socket.io-client";
 
 interface LoadingMap {
   [key: string]: boolean;
 }
 
-interface AuthStore {
-  authUser: AuthUser;
+type AuthStore = {
   loadingMap: LoadingMap;
+  onlineContacts: string[],
+  socket: Socket | null,
   checkAuth: () => Promise<void>;
-  signup: (data: any) => Promise<void>;
-  login: (data: any) => Promise<void>;
+  signup: (data: SignupData) => Promise<void>;
+  login: (data: LoginData) => Promise<void>;
   logout: () => Promise<void>;
+  connectSocket: () => void;
+  disconnectSocket: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  authUser: {
-    data: null,
-    isLoading: true,
-  },
+export const useAuthStore = create<AuthStore>((set, get) => ({
   loadingMap: {},
+  onlineContacts: [],
+  socket: null,
 
   checkAuth: async () => {
     console.log("checkAuth");
-    set((state) => ({
-      authUser: {
-        ...state.authUser,
-        isLoading: true
-      }
-    }))
-    try {
-      const res = await axiosInstance.get('/auth/checkAuth');
 
-      set({
-        authUser: {
-          data: res.data,
-          isLoading: false
-        }
-      })
+    useUserStore.getState().setAuthUserDataAndLoading(null, true)
+
+    try {
+      const res = await axiosInstance.get('/auth/checkAuth')
+      useUserStore.getState().setAuthUserDataAndLoading(res.data, false)
+
+      get().connectSocket()
     } catch (error) {
       set((state) => ({
         loadingMap: {
           ...state.loadingMap,
           checkAuth: false
-        },
-        authUser: {
-          data: null,
-          isLoading: false
         }
       }))
+
+      useUserStore.getState().setAuthUserDataAndLoading(null, false)
       console.error("Error checking authentication:", error);
     }
   },
@@ -76,14 +65,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
         loadingMap: {
           ...state.loadingMap,
           signup: false
-        },
-        authUser: {
-          ...state.authUser,
-          data: res.data
         }
       }))
 
+      useUserStore.getState().setAuthUserDataAndLoading(res.data, false)
       toast.success("註冊成功！")
+
+      get().connectSocket()
     } catch (error) {
       set((state) => ({
         loadingMap: {
@@ -109,14 +97,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
         loadingMap: {
           ...state.loadingMap,
           login: false
-        },
-        authUser: {
-          ...state.authUser,
-          data: res.data
         }
       }))
+
+      useUserStore.getState().setAuthUserDataAndLoading(res.data, false)
       toast.success("登入成功！")
 
+      get().connectSocket()
     } catch (error) {
       set((state) => ({
         loadingMap: {
@@ -124,6 +111,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
           login: false
         }
       }))
+
       toast.error(errorHandler(error))
       console.error("Error during login:", error);
     }
@@ -141,13 +129,13 @@ export const useAuthStore = create<AuthStore>((set) => ({
         loadingMap: {
           ...state.loadingMap,
           logout: false
-        },
-        authUser: {
-          ...state.authUser,
-          data: null
         }
       }))
+
+      useUserStore.getState().setAuthUserDataAndLoading(null, false)
       toast.success("登出成功！")
+
+      get().disconnectSocket()
     } catch (error) {
       set((state) => ({
         loadingMap: {
@@ -155,8 +143,40 @@ export const useAuthStore = create<AuthStore>((set) => ({
           logout: false
         }
       }))
+
       toast.error(errorHandler(error))
       console.error("Error during logout:", error);
     }
+  },
+  connectSocket: () => {
+    const { authUser } = useUserStore.getState()
+    if (!authUser || get().socket?.connected) return
+
+    const SOCKET_URL = import.meta.env.VITE_MODE === 'dev' ? import.meta.env.VITE_SOCKET_URL : '/'
+
+    const socket = io(SOCKET_URL, {
+      query: {
+        userId: authUser.data?._id
+      }
+    })
+    socket.connect()
+
+    socket.on('connect', () => {
+      console.log('Connected to Socket.io server!');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
+    set({ socket: socket });
+
+    // 取得上線使用者
+    socket.on('getOnlineUsers', (userIds) => {
+      set({ onlineContacts: userIds })
+    })
+  },
+  disconnectSocket: () => {
+    if (get().socket?.connected) get().socket?.disconnect()
   }
 }))

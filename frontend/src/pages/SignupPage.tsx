@@ -19,7 +19,8 @@ const SignupPage = () => {
     password: "",
     gender: null
   })
-  const { loadingMap, signup } = useAuthStore()
+  const loadingMap = useAuthStore((state) => state.loadingMap)
+  const signup = useAuthStore((state) => state.signup)
 
   const validateForm = () => {
     if(!formData.username.trim()) return toast.error("請輸入使用者名稱")

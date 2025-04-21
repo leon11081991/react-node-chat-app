@@ -1,13 +1,21 @@
 import { useEffect } from "react"
 import { useAuthStore } from "./store/useAuthStore"
+import { useUserStore } from "./store/useUserStore"
+import { ThemeProvider } from "./contexts/themeContext"
 
 import Nav from "./components/Nav"
 import AppRoutes from "./routes/AppRoutes"
 import { Loader } from "lucide-react"
 import { Toaster } from "react-hot-toast"
 
+
 const App = () => {
-  const { authUser, checkAuth } = useAuthStore()
+  console.log("App render");
+  const authUser = useUserStore((state)=>state.authUser)
+  const onlineContacts = useAuthStore((state)=>state.onlineContacts)
+  const checkAuth = useAuthStore((state) => state.checkAuth)
+
+  console.log("onlineContacts", onlineContacts);
 
   useEffect(()=>{
     console.log("App useEffect");
@@ -23,11 +31,11 @@ const App = () => {
   }
 
   return (
-    <>
+    <ThemeProvider>
       <Nav user={authUser.data}/>
       <AppRoutes user={authUser.data}/>
       <Toaster/>
-    </>
+    </ThemeProvider>
   )
 }
 
