@@ -32,9 +32,9 @@ if (process.env.NODE_ENV === 'prod') {
   // 設定靜態文件路徑
   app.use(express.static(path.join(__dirname, 'frontend', 'dist')))
   // 處理所有路由
-  app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'))
-  })
+  // app.get('/*', (req, res) => {
+  //   res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'))
+  // })
 }
 
 httpServer.listen(PORT, () => {
