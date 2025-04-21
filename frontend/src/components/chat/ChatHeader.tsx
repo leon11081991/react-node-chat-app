@@ -15,15 +15,15 @@ const ChatHeader = () => {
           {/* Avatar */}
           <div className="avatar">
             <div className="size-10 rounded-full relative">
-              <img src={selectedUser.avatar || DEFAULT_AVATAR} alt={selectedUser.username} />
+              <img src={selectedUser?.avatar || DEFAULT_AVATAR} alt={selectedUser?.username} />
             </div>
           </div>
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">{selectedUser.username}</h3>
+            <h3 className="font-medium">{selectedUser?.username}</h3>
             <p className="text-sm text-base-content/70">
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+              {onlineUsers.includes(selectedUser?._id || "") ? "Online" : "Offline"}
             </p>
           </div>
         </div>

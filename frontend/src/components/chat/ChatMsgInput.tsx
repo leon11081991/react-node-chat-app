@@ -5,7 +5,7 @@ import toast from "react-hot-toast"
 
 const ChatMsgInput = () => {
   const [text, setText] = useState("")
-  const [imgPreview, setImgPreview] = useState<string | null>(null)
+  const [imgPreview, setImgPreview] = useState<string | undefined>(undefined)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const sendMessage = useChatStore((state) => state.sendMessage)
 
@@ -28,7 +28,7 @@ const ChatMsgInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
-    setImgPreview(null)
+    setImgPreview(undefined)
   }
   const handleSendMessage = async(e: React.FormEvent) => {
     e.preventDefault()
@@ -37,7 +37,7 @@ const ChatMsgInput = () => {
       await sendMessage({ text: text.trim(), image: imgPreview })
 
       setText("")
-      setImgPreview(null)
+      setImgPreview(undefined)
     } catch (error) {
       console.error('handleSendMessage fail',error)
     }

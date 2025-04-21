@@ -17,6 +17,7 @@ const ChatContainer = () => {
   const unsubscribeFromMessages = useChatStore((state) => state.unsubscribeFromMessages)
 
   useEffect(() => {
+    if (!selectedUser) return
     getMessages(selectedUser._id)
     // 訂閱新訊息
     subscribeToMessages()
@@ -25,7 +26,7 @@ const ChatContainer = () => {
       // 取消訂閱新訊息
       unsubscribeFromMessages()
     }
-  },[selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages])
+  },[selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages])
 
   useEffect(() => {
     // 收到新訊息 滾動到最下方
@@ -56,7 +57,7 @@ const ChatContainer = () => {
                       src={
                         message.senderId === authUser.data?._id
                           ? authUser.data.avatar || DEFAULT_AVATAR
-                          : selectedUser.avatar || DEFAULT_AVATAR
+                          : selectedUser?.avatar || DEFAULT_AVATAR
                       }
                       alt="profile pic"
                     />

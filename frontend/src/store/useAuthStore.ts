@@ -1,4 +1,5 @@
 import type { Socket } from "socket.io-client";
+import type { LoginData, SignupData } from "../types/user.type";
 import { create } from "zustand";
 import { useUserStore } from "./useUserStore.ts";
 import axiosInstance from "../utils/api/axios-instance.ts";
@@ -6,18 +7,17 @@ import toast from "react-hot-toast";
 import errorHandler from "../utils/api/error-handler.ts";
 import { io } from "socket.io-client";
 
-// todo: 將interface移到型別資料夾
 interface LoadingMap {
   [key: string]: boolean;
 }
 
 type AuthStore = {
   loadingMap: LoadingMap;
-  onlineContacts: any[],
+  onlineContacts: string[],
   socket: Socket | null,
   checkAuth: () => Promise<void>;
-  signup: (data: any) => Promise<void>;
-  login: (data: any) => Promise<void>;
+  signup: (data: SignupData) => Promise<void>;
+  login: (data: LoginData) => Promise<void>;
   logout: () => Promise<void>;
   connectSocket: () => void;
   disconnectSocket: () => void;
@@ -35,7 +35,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       const res = await axiosInstance.get('/auth/checkAuth')
-      console.log("checkAuth res", res);
       useUserStore.getState().setAuthUserDataAndLoading(res.data, false)
 
       get().connectSocket()
@@ -48,7 +47,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       }))
 
       useUserStore.getState().setAuthUserDataAndLoading(null, false)
-
       console.error("Error checking authentication:", error);
     }
   },
@@ -154,17 +152,25 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { authUser } = useUserStore.getState()
     if (!authUser || get().socket?.connected) return
 
-    const socket = io(import.meta.env.VITE_BASE_URL, {
+    const socket = io(import.meta.env.VITE_SOCKET_URL, {
       query: {
         userId: authUser.data?._id
       }
     })
     socket.connect()
+
+    socket.on('connect', () => {
+      console.log('Connected to Socket.io server!');
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
+    });
+
     set({ socket: socket });
 
     // 取得上線使用者
     socket.on('getOnlineUsers', (userIds) => {
-      console.log("getOnlineUsers----------------------------------", userIds);
       set({ onlineContacts: userIds })
     })
   },

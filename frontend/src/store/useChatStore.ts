@@ -1,17 +1,10 @@
+import type { Message, MessageData } from "../types/message.type"
+import type { User } from "../types/user.type"
 import { create } from "zustand"
 import axiosInstance from "../utils/api/axios-instance"
 import { toast } from "react-hot-toast"
 import errorHandler from "../utils/api/error-handler"
 import { useAuthStore } from "./useAuthStore"
-
-interface Message {
-  _id: string
-  senderId: string
-  receiver: string
-  text: string
-  image: string
-  createdAt: string
-}
 
 interface ChatStore {
   messages: {
@@ -19,16 +12,16 @@ interface ChatStore {
     isLoading: boolean
   },
   contactUsers: {
-    data: any[]
+    data: User[]
     isLoading: boolean
   },
-  selectedUser: any
+  selectedUser: User | null
   getContactUsers: () => Promise<void>
   getMessages: (userId: string) => Promise<void>
-  sendMessage: (messageData: any) => Promise<void>
+  sendMessage: (messageData: MessageData) => Promise<void>
   subscribeToMessages: () => void
   unsubscribeFromMessages: () => void
-  setSelectedUser: (user: any) => void
+  setSelectedUser: (user: User | null) => void
 }
 
 export const useChatStore = create<ChatStore>((set, get) => ({
@@ -86,6 +79,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         }
       }))
     } catch (error) {
+      toast.error(errorHandler(error))
       set((state) => ({
         messages: {
           ...state.messages,
@@ -97,6 +91,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   sendMessage: async (messageData) => {
     const { selectedUser } = get()
     try {
+      if (!selectedUser) return
       const res = await axiosInstance.post(`/message/send/${selectedUser._id}`, messageData)
       set((state) => ({
         messages: {
