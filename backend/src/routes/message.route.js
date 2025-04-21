@@ -14,7 +14,7 @@ const router = express.Router()
 // 取得聯絡人
 router.get('/contacts', protectRoute, getContactsController)
 // 接收訊息
-router.get('/:contactId', protectRoute, getMessagesController)
+router.get('/messages/:contactId', protectRoute, getMessagesController)
 // 傳送訊息
 router.post('/send/:contactId', protectRoute, sendMessageController)
 

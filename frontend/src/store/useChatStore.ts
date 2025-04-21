@@ -70,7 +70,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       }
     }))
     try {
-      const res = await axiosInstance.get(`/message/${userId}`)
+      const res = await axiosInstance.get(`/message/messages/${userId}`)
       set((state) => ({
         messages: {
           ...state.messages,
