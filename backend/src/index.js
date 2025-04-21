@@ -17,7 +17,7 @@ app.use(express.json()) // 解析JSON請求體
 app.use(cookieParser()) // 解析cookie
 app.use(
   cors({
-    origin: 'http://localhost:5173', // 允許的來源
+    origin: ['http://localhost:5173', 'http://localhost:3000'], // 允許的來源
     credentials: true, // 允許攜帶cookie
   }),
 )
@@ -27,6 +27,10 @@ app.use('/api/user', UserRoutes)
 app.use('/api/message', MessageRoutes)
 
 httpServer.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`)
+  console.log(
+    process.env.NODE_ENV === 'dev'
+      ? `Server is running on http://localhost:${PORT}`
+      : `Server is running`,
+  )
   connectDB()
 })

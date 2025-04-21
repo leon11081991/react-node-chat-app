@@ -6,7 +6,7 @@ const app = express() // 創建Express應用程式
 const httpServer = createServer(app) // 創建HTTP伺服器
 const io = new Server(httpServer, {
   cors: {
-    origin: ['http://localhost:5173'],
+    origin: ['http://localhost:5173', 'http://localhost:3000'],
   },
 })
 

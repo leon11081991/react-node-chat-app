@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import errorHandler from "../utils/api/error-handler.ts";
 import { io } from "socket.io-client";
 
-const BASE_URL = "http://localhost:5001"
 // todo: 將interface移到型別資料夾
 interface LoadingMap {
   [key: string]: boolean;
@@ -155,7 +154,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { authUser } = useUserStore.getState()
     if (!authUser || get().socket?.connected) return
 
-    const socket = io(BASE_URL, {
+    const socket = io(import.meta.env.VITE_BASE_URL, {
       query: {
         userId: authUser.data?._id
       }

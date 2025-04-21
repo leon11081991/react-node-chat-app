@@ -30,7 +30,7 @@ export const useUserStore = create<UserStore>((set) => ({
   updateUserAvatar: async (imgUrl: string) => {
     console.log("updateUserAvatar");
     try {
-      const res = await axiosInstance.put("/user/updateAvatar", {
+      await axiosInstance.put("/user/updateAvatar", {
         avatar: imgUrl
       })
       toast.success("更新大頭貼成功")
